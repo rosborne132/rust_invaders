@@ -1,0 +1,12 @@
+[package]
+name = "invaders"
+version = "0.1.0"
+authors = ["rosborne132 <ozborne132@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossterm = "0.20.0"
+rusty_audio = "1.2"
+rusty_time = "0.11"
