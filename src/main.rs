@@ -1,5 +1,20 @@
 use std::error::Error;
+use std::sync::mpsc;
+use std::time::{Duration};
+use std::{io, thread};
+
 use rusty_audio::Audio;
+
+use crossterm::cursor::{Hide, Show};
+use crossterm::event::{Event, KeyCode};
+use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::{event, terminal, ExecutableCommand};
+
+mod components;
+
+use components::frame::{Drawable, new_frame};
+use components::player::Player;
+use components::render::{render};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut audio = Audio::new();
@@ -11,7 +26,58 @@ fn main() -> Result<(), Box<dyn Error>> {
     audio.add("win", "assets/sounds/win.wav");
     audio.play("startup");
 
+    // Terminal
+    let mut stdout = io::stdout();
+    terminal::enable_raw_mode()?;
+    stdout.execute(EnterAlternateScreen)?;
+    stdout.execute(Hide)?;
+
+    // Render loop in a separate thread
+    let (render_tx, render_rx) = mpsc::channel();
+    let render_handle = thread::spawn(move || {
+        let mut last_frame = new_frame();
+        let mut stdout = io::stdout();
+        render(&mut stdout, &last_frame, &last_frame, true);
+        while let Ok(current_frame) = render_rx.recv() {
+            render(&mut stdout, &last_frame, &current_frame, false);
+            last_frame = current_frame;
+        }
+    });
+
+    // Game loop
+    let mut player = Player::new();
+    'gameloop: loop {
+        // Per-Frame init
+        let mut current_frame = new_frame();
+
+        // Input
+        while event::poll(Duration::default())? {
+            if let Event::Key(key_event) = event::read()? {
+                match key_event.code {
+                    KeyCode::Left => player.move_left(),
+                    KeyCode::Right => player.move_right(),
+                    KeyCode::Esc | KeyCode::Char('q') => {
+                        audio.play("lose");
+                        break 'gameloop;
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        // Draw and render
+        player.draw(&mut current_frame);
+        let _ = render_tx.send(current_frame);
+        thread::sleep(Duration::from_millis(1));
+    }
+
     // Cleanup
+    drop(render_tx);
+    render_handle.join().unwrap();
     audio.wait();
-    Ok(())
+    stdout.execute(Show)?;
+    stdout.execute(LeaveAlternateScreen)?;
+    terminal::disable_raw_mode()?;
+
+    return Ok(());
 }

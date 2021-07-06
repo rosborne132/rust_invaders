@@ -1,5 +1,5 @@
 [package]
-name = "invaders"
+name = "rust_invaders"
 version = "0.1.0"
 authors = ["rosborne132 <ozborne132@gmail.com>"]
 edition = "2018"
