@@ -12,9 +12,9 @@ use crossterm::{event, terminal, ExecutableCommand};
 
 mod components;
 
-use components::frame::{Drawable, new_frame};
+use components::frame::{new_frame, Drawable};
 use components::player::Player;
-use components::render::{render};
+use components::render::render;
 use components::shot::Shot;
 
 fn main() -> Result<(), Box<dyn Error>> {

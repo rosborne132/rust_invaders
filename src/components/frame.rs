@@ -1,6 +1,6 @@
 use super::constants::{NUM_COLS, NUM_ROWS};
 
-pub type Frame = Vec<Vec<& 'static str>>;
+pub type Frame = Vec<Vec<&'static str>>;
 
 #[allow(dead_code)]
 pub fn new_frame() -> Frame {
@@ -13,7 +13,7 @@ pub fn new_frame() -> Frame {
         cols.push(col);
     }
 
-     return cols;
+    return cols;
 }
 
 pub trait Drawable {

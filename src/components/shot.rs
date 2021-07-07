@@ -7,7 +7,7 @@ pub struct Shot {
     pub x: usize,
     pub y: usize,
     pub exploding: bool,
-    timer: Timer
+    timer: Timer,
 }
 
 impl Shot {
@@ -16,7 +16,7 @@ impl Shot {
             x,
             y,
             exploding: false,
-            timer: Timer::from_millis(50)
+            timer: Timer::from_millis(50),
         }
     }
 
@@ -37,12 +37,12 @@ impl Shot {
     }
 
     pub fn dead(&self) -> bool {
-      (self.exploding && self.timer.ready) || (self.y == 0)
+        (self.exploding && self.timer.ready) || (self.y == 0)
     }
 }
 
 impl Drawable for Shot {
-  fn draw(&self, frame: &mut Frame) {
-      frame[self.x][self.y] = if self.exploding { "*" } else { "|" };
-  }
+    fn draw(&self, frame: &mut Frame) {
+        frame[self.x][self.y] = if self.exploding { "*" } else { "|" };
+    }
 }

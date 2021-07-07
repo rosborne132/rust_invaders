@@ -4,7 +4,7 @@ use crossterm::terminal::{Clear, ClearType};
 use crossterm::QueueableCommand;
 use std::io::{Stdout, Write};
 
-use super::frame::{Frame};
+use super::frame::Frame;
 
 pub fn render(stdout: &mut Stdout, last_frame: &Frame, current_frame: &Frame, force: bool) {
     if force {

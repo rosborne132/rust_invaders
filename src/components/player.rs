@@ -1,13 +1,13 @@
-use super::constants::{NUM_COLS, NUM_ROWS};
 use std::time::Duration;
 
+use super::constants::{NUM_COLS, NUM_ROWS};
 use super::frame::{Drawable, Frame};
 use super::shot::Shot;
 
 pub struct Player {
     x: usize,
     y: usize,
-    shots: Vec<Shot>
+    shots: Vec<Shot>,
 }
 
 impl Player {
@@ -42,7 +42,7 @@ impl Player {
         }
     }
 
-    pub fn update (&mut self, delta: Duration) {
+    pub fn update(&mut self, delta: Duration) {
         for shot in self.shots.iter_mut() {
             shot.update(delta);
         }
