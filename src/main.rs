@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::sync::mpsc;
-use std::time::{Duration};
+use std::time::{Duration, Instant};
 use std::{io, thread};
 
 use rusty_audio::Audio;
@@ -15,6 +15,7 @@ mod components;
 use components::frame::{Drawable, new_frame};
 use components::player::Player;
 use components::render::{render};
+use components::shot::Shot;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut audio = Audio::new();
@@ -46,8 +47,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Game loop
     let mut player = Player::new();
+    let mut instant = Instant::now();
     'gameloop: loop {
         // Per-Frame init
+        let delta = instant.elapsed();
+        instant = Instant::now();
         let mut current_frame = new_frame();
 
         // Input
@@ -56,6 +60,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                 match key_event.code {
                     KeyCode::Left => player.move_left(),
                     KeyCode::Right => player.move_right(),
+                    KeyCode::Char(' ') | KeyCode::Enter => {
+                        if player.shoot() {
+                            audio.play("pew");
+                        }
+                    }
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'gameloop;
@@ -64,6 +73,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+
+        // Updates
+        player.update(delta);
 
         // Draw and render
         player.draw(&mut current_frame);
